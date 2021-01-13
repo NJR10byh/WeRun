@@ -4,8 +4,9 @@ const getDate = function() {
 	var year = date.getFullYear(); //年 ,从 Date 对象以四位数字返回年份
 	var month = date.getMonth() + 1; //月 ,从 Date 对象返回月份 (0 ~ 11) ,date.getMonth()比实际月份少 1 个月
 	var day = date.getDate(); //日 ,从 Date 对象返回一个月中的某一天 (1 ~ 31)
-	var week = date.getDay() - 1;
-	var weekname = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期七'];
+	var week = date.getDay();
+	// console.log(date.getDay());
+	var weekname = ['星期日','星期一', '星期二', '星期三', '星期四', '星期五', '星期六', ];
 
 	// var hours = date.getHours(); //小时 ,返回 Date 对象的小时 (0 ~ 23)
 	// var minutes = date.getMinutes(); //分钟 ,返回 Date 对象的分钟 (0 ~ 59)

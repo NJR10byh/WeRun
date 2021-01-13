@@ -1,0 +1,26 @@
+{
+	"name": "DCPedometer",
+	"id": "DC-Pedometer",
+	"version": "1.0.0",
+	"description": "计步器插件",
+	"_dp_type":"nativeplugin",
+	"_dp_nativeplugin":{
+		"ios": {
+			"plugins": [
+				{
+					"type": "module",
+					"name": "DC-Pedometer",
+					"class": "DCStepCounterModule"
+				}
+			],
+			"integrateType": "library",
+			"deploymentTarget": "8.0",
+			"frameworks":[
+				"CoreMotion.framework"
+			],
+			"privacies": [
+				"NSMotionUsageDescription"
+			]
+		}
+	}
+}

@@ -16,12 +16,18 @@
             "autoclose" : true,
             "delay" : 0
         },
+        "safearea" : {
+            "bottom" : {
+                "offset" : "none"
+            }
+        },
         /* 模块配置 */
         "modules" : {
             "FaceID" : {},
             "Maps" : {},
             "Fingerprint" : {},
-            "Geolocation" : {}
+            "Geolocation" : {},
+            "OAuth" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -30,6 +36,8 @@
                 "permissions" : [
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.CAMERA\"/>",
@@ -37,17 +45,23 @@
                     "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
                     "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
                     "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
                     "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.USE_FINGERPRINT\"/>",
                     "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
                     "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
                 ]
             },
             /* ios打包配置 */
-            "ios" : {},
+            "ios" : {
+                "privacyDescription" : {
+                    "NSMotionUsageDescription" : "该APP需要您的运动与健康数据"
+                }
+            },
             /* SDK配置 */
             "sdkConfigs" : {
                 "maps" : {
@@ -62,6 +76,48 @@
                         "appkey_ios" : "4c58725e0f5efe1d7bcdd775e7abbf31",
                         "appkey_android" : "d88282cea7e1c46f5494d5203e110e99"
                     }
+                },
+                "UIUserInterfaceStyle" : "Automatic",
+                "oauth" : {
+                    "weixin" : {
+                        "appid" : "",
+                        "appsecret" : "",
+                        "UniversalLinks" : ""
+                    },
+                    "qq" : {
+                        "appid" : ""
+                    },
+                    "apple" : {}
+                }
+            }
+        },
+        "nativePlugins" : {
+            "DC-Pedometer" : {
+                "__plugin_info__" : {
+                    "name" : "DCPedometer",
+                    "description" : "计步器插件",
+                    "platforms" : "iOS",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {}
+                }
+            },
+            "DC-StepCounter" : {
+                "__plugin_info__" : {
+                    "name" : "StepCounter",
+                    "description" : "计步器",
+                    "platforms" : "Android",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {}
                 }
             }
         }

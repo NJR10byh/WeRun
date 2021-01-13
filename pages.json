@@ -11,14 +11,16 @@
 			"path": "pages/Tabber/mine",
 			"style": {
 				"navigationBarTitleText": "我的",
-				"navigationBarBackgroundColor": "#fff"
+				"navigationBarBackgroundColor": "#fff",
+				"backgroundColor": "#f5f5f5",
+				"backgroundColorBottom": "#f5f5f5",
+				"enablePullDownRefresh": true
 			}
-
 		}, {
-			"path": "pages/Tabber/history",
+			"path": "pages/Tabber/life",
 			"style": {
-				"navigationBarTitleText": "历史轨迹",
-				"enablePullDownRefresh": false
+				"navigationBarTitleText": "生活",
+				"enablePullDownRefresh": true
 			}
 
 		}, {
@@ -28,17 +30,45 @@
 				"navigationBarBackgroundColor": "#f5f5f5",
 				"enablePullDownRefresh": false
 			}
+		}, {
+			"path": "pages/Functions/historypath",
+			"style": {
+				"navigationStyle": "custom"
+			}
+
+		}, {
+			"path": "pages/Functions/login",
+			"style": {
+				"navigationBarTitleText": "欢迎登录",
+				"enablePullDownRefresh": false
+			}
+
+		},
+		{
+			"path": "pages/Functions/cityselect",
+			"style": {
+				"navigationBarTitleText": "城市选择",
+				"enablePullDownRefresh": false
+			}
+
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#f5f5f5",
+		"navigationBarBackgroundColor": "#fff",
 		"backgroundColor": "#f5f5f5"
 	},
 	"tabBar": {
+		// blurEffect-高斯模糊 for iOS
+		// "dark" - 暗风格模糊，对应iOS原生UIBlurEffectStyleDark效果；
+		// "extralight" - 高亮风格模糊，对应iOS原生UIBlurEffectStyleExtraLight效果；
+		// "light" - 亮风格模糊，对应iOS原生UIBlurEffectStyleLight效果；
+		// "none" - 无模糊效果。
+		"blurEffect": "light",
 		"color": "#666",
 		"selectedColor": "#940F8A",
+		"borderStyle": "#eaeaea",
 		"list": [{
 				"text": "首页",
 				"pagePath": "pages/Tabber/index",
@@ -46,10 +76,10 @@
 				"selectedIconPath": "static/img/run-active.png"
 			},
 			{
-				"text": "历史轨迹",
-				"pagePath": "pages/Tabber/history",
-				"iconPath": "static/img/history.png",
-				"selectedIconPath": "static/img/history-active.png"
+				"text": "生活",
+				"pagePath": "pages/Tabber/life",
+				"iconPath": "static/img/life.png",
+				"selectedIconPath": "static/img/life-active.png"
 			},
 			{
 				"text": "我的",

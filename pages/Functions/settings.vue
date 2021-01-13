@@ -7,11 +7,11 @@
 		</view>
 		<view class="part1">
 			<view class="part1left" @click="Changephoto">
-				<image src="../../static/under-armour.png" mode="aspectFit"></image>
+				<image :src="userinfo.avatarUrl" mode="aspectFit"></image>
 			</view>
 			<view class="part1right">
 				<view class="username">
-					NJR10byh Tutu
+					{{userinfo.nickName}}
 				</view>
 				<view class="userinfo">
 					<view class="userlevel" @click="Level">
@@ -51,8 +51,34 @@
 
 <script>
 	export default {
+		onShow: function() {
+			let that = this;
+			if (getApp().globalData.qq.logined) {
+				that.userinfo.logined = getApp().globalData.qq.logined;
+				that.userinfo.nickName = getApp().globalData.qq.nickName;
+				that.userinfo.openId = getApp().globalData.qq.openId;
+				that.userinfo.avatarUrl = getApp().globalData.qq.avatarUrl;
+			} else if (getApp().globalData.wechat.logined) {
+				that.userinfo.logined = getApp().globalData.wechat.logined;
+				that.userinfo.nickName = getApp().globalData.wechat.nickName;
+				that.userinfo.openId = getApp().globalData.wechat.openId;
+				that.userinfo.avatarUrl = getApp().globalData.wechat.avatarUrl;
+			} else if (getApp().globalData.weibo.logined) {
+				that.userinfo.logined = getApp().globalData.weibo.logined;
+				that.userinfo.nickName = getApp().globalData.weibo.nickName;
+				that.userinfo.openId = getApp().globalData.weibo.openId;
+				that.userinfo.avatarUrl = getApp().globalData.weibo.avatarUrl;
+			}
+		},
 		data() {
 			return {
+				// 登录信息
+				userinfo: {
+					logined: "",
+					nickName: "",
+					openId: "",
+					avatarUrl: ""
+				},
 				functions: [{
 						left: "修改昵称"
 					},
@@ -144,7 +170,7 @@
 
 				.username {
 					// border: 1px solid red;
-					font-size: 18px;
+					font-size: 35rpx;
 					font-weight: bold;
 				}
 
@@ -156,7 +182,7 @@
 
 					.userlevel {
 						// border: 1px solid red;
-						font-size: 13px;
+						font-size: 25rpx;
 						font-weight: bold;
 						color: $theme-color;
 						background-color: #f0f0f0;
@@ -166,7 +192,7 @@
 
 					.usersvip {
 						// border: 1px solid red;
-						font-size: 12px;
+						font-size: 25rpx;
 						font-weight: bold;
 						color: #d63031;
 						background-color: #ffd32a;
@@ -178,7 +204,8 @@
 			}
 		}
 
-		.part2,.part3 {
+		.part2,
+		.part3 {
 			// border: 1px solid red;
 			width: 750rpx;
 			display: flex;

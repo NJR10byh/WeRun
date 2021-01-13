@@ -10,8 +10,11 @@
 						Today
 					</view>
 				</view>
-				<view class="topright">
-					<image src="../../static/under-armour.png" mode="aspectFit" @click="Settings"></image>
+				<view class="topright" v-if="logined==false" @click="login">
+					Sign in
+				</view>
+				<view class="topright" v-if="logined==true">
+					<image :src="avatarUrl" mode="aspectFit" @click="Settings"></image>
 				</view>
 			</view>
 			<view class="todayview">
@@ -54,11 +57,11 @@
 			</view>
 		</view>
 		<view class="history">
-			<view class="historytext">
+			<view class="historytext" @tap="isAvailable">
 				近期活动
 			</view>
-			<view class="historyinfo" v-for="item in RunHistory">
-				<view class="historyinfodetail">
+			<view class="historyinfo" v-for="(item,index) in RunHistory">
+				<view class="historyinfodetail" @click="history(index)">
 					<view class="historytop">
 						<view class="logo">
 							<image :src="item.imgsrc" mode="aspectFit"></image>
@@ -99,79 +102,187 @@
 								{{item.historyspeed}}
 							</view>
 							<view class="down">
-								配速（每公里）
+								配速
 							</view>
 						</view>
 					</view>
 				</view>
 			</view>
 		</view>
+		<view class="bottom"></view>
 	</view>
 </template>
 
 <script>
 	import currentDate from "./gettime.js";
+	const pedometer = uni.requireNativePlugin('DC-Pedometer');
 	export default {
-		// 进页面获取系统时间
+		// 进页面获取系统时间及用户跑步信息
 		onShow: function() {
-			currentDate.getDate();
-			// console.log(currentDate.getDate());
-			this.date = currentDate.getDate();
+			let that = this;
+			// console.log(pedometer.isAvailable());
+			that.distance = (getApp().globalData.historyPathDistance / 1000).toFixed(3);
+			that.date = currentDate.getDate();
+			if (getApp().globalData.qq.logined) {
+				that.logined = getApp().globalData.qq.logined;
+				that.avatarUrl = getApp().globalData.qq.avatarUrl;
+				for (var i = 0; i < getApp().globalData.History.length; i++) {
+					if (getApp().globalData.qq.openId == getApp().globalData.History[i].openId) {
+						that.RunHistory = getApp().globalData.History[i].RunHistory;
+					}
+				}
+			} else if (getApp().globalData.wechat.logined) {
+				that.logined = getApp().globalData.wechat.logined;
+				that.avatarUrl = getApp().globalData.wechat.avatarUrl;
+			} else if (getApp().globalData.weibo.logined) {
+				that.logined = getApp().globalData.weibo.logined;
+				that.avatarUrl = getApp().globalData.weibo.avatarUrl;
+			}
+		},
+		onPullDownRefresh: function() {
+			let that = this;
+			setTimeout(function() {
+				console.log(currentDate.getDate());
+				that.date = currentDate.getDate();
+			}, 1000);
+			uni.stopPullDownRefresh();
 		},
 		data() {
 			return {
+				//是否登录
+				logined: false,
+				// 用户头像
+				avatarUrl: "",
+
 				date: "",
 				runtimes: 2,
-				distance: 8.5,
+				distance: "",
 				time: "4:21:43",
 				speed: "4分20秒",
 
 				// 跑步历史
-				RunHistory: [{
-						"time": "2020-10-20",
-						"week": "星期二",
-						"runtimedetail": "早晨跑",
-						"historydistance": 4.3,
-						"totaltime": "2:13:25",
-						"historyspeed": "3分36秒",
-						"imgsrc": "../../static/nike.png"
-					},
-					{
-						"time": "2020-10-22",
-						"week": "星期四",
-						"runtimedetail": "晚间跑",
-						"historydistance": 7.5,
-						"totaltime": "4:12:56",
-						"historyspeed": "5分17秒",
-						"imgsrc": "../../static/under-armour.png"
-					},
-					{
-						"time": "2020-12-06",
-						"week": "星期日",
-						"runtimedetail": "中午跑",
-						"historydistance": 2.8,
-						"totaltime": "1:32:28",
-						"historyspeed": "2分21秒",
-						"imgsrc": "../../static/puma.png"
-					}
-				]
+				RunHistory: ""
 			}
 		},
 		methods: {
+			// 跳转登录界面
+			login() {
+				uni.navigateTo({
+					url: "../Functions/login"
+				});
+			},
+			// 跳转设置界面
 			Settings() {
 				uni.navigateTo({
 					url: "../Functions/settings"
+				});
+			},
+			// 跳转历史轨迹界面
+			history(index) {
+				console.log(index);
+				// 检查支持的认证方式
+				uni.checkIsSupportSoterAuthentication({
+					success(res) {
+						console.log(res.supportMode[0]);
+						// 支持Face ID
+						if (res.supportMode[0] == "facial") {
+							// 检查是否录入Face ID
+							uni.checkIsSoterEnrolledInDevice({
+								checkAuthMode: 'facial',
+								success(res) {
+									if (res.isEnrolled == true) {
+										// 进行Face ID认证
+										uni.startSoterAuthentication({
+											requestAuthModes: ['facial'],
+											challenge: '123456',
+											authContent: '请用FaceID解锁',
+											success(res) {
+												console.log(res);
+												// uni.navigateTo({
+												// 	url: "../Functions/historypath"
+												// })
+											},
+											fail(err) {
+												console.log(err);
+											},
+											complete(res) {
+												console.log(res);
+											}
+										})
+									}
+								},
+							})
+						} else if (res.supportMode[0] == "fingerPrint") {
+							// 检查是否录入指纹
+							uni.checkIsSoterEnrolledInDevice({
+								checkAuthMode: 'fingerPrint',
+								success(res) {
+									// 进行Touch ID认证
+									uni.startSoterAuthentication({
+										requestAuthModes: ['fingerPrint'],
+										challenge: '123456',
+										authContent: '请用指纹解锁',
+										success(res) {
+											console.log(res);
+										},
+										fail(err) {
+											console.log(err);
+										},
+										complete(res) {
+											console.log(res);
+										}
+									})
+								},
+							})
+						}
+					}
 				})
+			},
+			// 是否支持计步器
+			isAvailable() {
+				var avaliable = pedometer.isAvailable();
+				console.log(avaliable);
+			},
+			// 开始计步
+			startPedometer() {
+				pedometer.startPedometer(ret => {
+					this.tranMsg = JSON.stringify(ret);
+				});
+			},
+			// 暂停计步
+			pausePedometer() {
+				pedometer.pausePedometer();
+			},
+			// 停止计步
+			stopPedometer() {
+				pedometer.stopPedometer();
+			},
+			// 查询 2019-01-20 日数据
+			queryPedometerData() {
+				pedometer.queryPedometerData({
+					start: "2019-01-20 00:00:00",
+					end: "2019-01-21 00:00:00"
+				}, ret => {
+					this.tranMsg = JSON.stringify(ret);
+				});
 			}
 		}
 	}
 </script>
 
 <style lang="scss">
+	page {
+		height: 100%;
+		background-color: #f5f5f5;
+	}
+
 	.container {
 		// border: 1px solid red;
 		width: 750rpx;
 		background-color: #f5f5f5;
+		// iOS安全区域设置
+		padding-bottom: constant(safe-area-inset-bottom);
+		padding-bottom: env(safe-area-inset-bottom);
 
 		.today {
 			// border: 1px solid green;
@@ -183,7 +294,6 @@
 				// border: 1px solid red;
 				width: 96%;
 				height: 100rpx;
-				margin-top: 20rpx;
 				display: flex;
 				flex-direction: row;
 				justify-content: space-between;
@@ -204,7 +314,7 @@
 					}
 
 					.toptext {
-						color: back;
+						color: #000;
 						font-size: 50rpx;
 						font-weight: 900;
 						margin-left: 20rpx;
@@ -219,6 +329,9 @@
 					align-self: flex-end;
 					align-items: center;
 					justify-content: center;
+					font-size: 30rpx;
+					font-weight: bold;
+					color: #808080;
 
 					image {
 						width: 65rpx;
@@ -267,7 +380,7 @@
 						justify-content: space-between;
 
 						.speed .times .runtimes {
-							border: 1px solid red;
+							// border: 1px solid red;
 							display: flex;
 							flex-direction: column;
 							justify-content: center;
@@ -343,8 +456,6 @@
 
 						.historytop-right {
 							// border: 1px solid blue;
-							width: 200rpx;
-							height: 100rpx;
 							margin-left: 20rpx;
 							display: flex;
 							flex-direction: column;
@@ -387,13 +498,16 @@
 						flex-direction: row;
 						justify-content: space-around;
 						align-items: center;
-						border-top: 1px solid #dcdde1;
+						border-top: 1px solid #eaeaea;
 
-						.historydistance .totaltime .historyspeed {
+						.historydistance,
+						.totaltime,
+						.historyspeed {
+							// border: 1px solid red;
 							display: flex;
 							flex-direction: column;
 							justify-content: center;
-							align-items: center;
+							align-items: flex-start;
 						}
 
 						.up {
@@ -408,6 +522,11 @@
 					}
 				}
 			}
+		}
+
+		.bottom {
+			width: 750rpx;
+			height: $tabbar-height;
 		}
 	}
 </style>

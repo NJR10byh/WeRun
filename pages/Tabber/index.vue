@@ -1,30 +1,17 @@
 <template>
 	<view class="container">
 		<view class="mapview">
-			<map class="map" :latitude="latitude" :longitude="longitude" :markers="covers" :scale="scale" :polyline="polyline"></map>
+			<map class="map" :latitude="latitude" :longitude="longitude" :markers="covers" :scale="scale" :polyline="polyline"
+			 :controls="controls" @controltap="StartRun"></map>
 		</view>
-		<view class="bottompart1" v-if="startrun===true">
-			<button type="default" @click="StartRun">
-				<text>Start</text>
-			</button>
-		</view>
-		<view class="bottompart2" v-if="pauserun===true">
-			<image src="../../static/img/pause.png" mode="aspectFit" @click="Pause"></image>
-		</view>
-		<view class="bottompart3" v-if="continuerun===true">
-			<view class="bottompart3-right">
-				<image class="continueimg" src="../../static/img/continue.png" mode="aspectFit" @click="Continue"></image>
-				<image class="stopimg" src="../../static/img/stop.png" mode="aspectFit" @click="Stop"></image>
-			</view>
-		</view>
-		<!-- <uni-fab :pattern="pattern" direction="vertical"></uni-fab> -->
 	</view>
 </template>
 
 <script>
-	import uniFab from '@/components/uni-fab/uni-fab.vue';
 	var timer = null; // 进入页面获取位置的定时器
 	var startrun = null // 开始跑步的定时器
+	var run = null // 开始跑步的定时器
+	var i = 0;
 	export default {
 		onShow: function() {
 			let that = this;
@@ -36,26 +23,44 @@
 						that.longitude = res.longitude;
 						that.covers[0].latitude = res.latitude;
 						that.covers[0].longitude = res.longitude;
+						getApp().globalData.latitude = res.latitude;
+						getApp().globalData.longitude = res.longitude;
 						console.log(that.latitude, that.longitude);
 					}
 				});
 			}, 2000);
+			uni.getSystemInfo({
+				success: (res) => {
+					// console.log(res);
+					getApp().globalData.Systeminfo.systemheight = res.safeArea.height - 50;
+					this.controls[0].position.left = res.safeArea.width / 2 - 40;
+					this.controls[0].position.top = res.safeArea.height - 125;
+					// console.log(this.controls[0].position);
+				}
+			});
 		},
 		onHide: function() {
 			clearInterval(timer);
 		},
 		data() {
 			return {
-				startrun: true,
-				pauserun: false,
-				continuerun: false,
-
 				// Map
 				id: 0, // 使用 marker点击事件 需要填写id
 				title: 'map',
 				scale: 15,
 				latitude: 32.112895,
 				longitude: 118.931422,
+				controls: [{
+					id: 1,
+					position: {
+						left: "",
+						top: "",
+						width: 80,
+						height: 80
+					},
+					iconPath: "../../static/img/startrun.png",
+					clickable: true,
+				}],
 				covers: [{
 					latitude: "",
 					longitude: "",
@@ -65,22 +70,6 @@
 				}],
 				polyline: [{
 					// 经纬度数组
-					// points: [{
-					// 		"latitude": 32.112895,
-					// 		"longitude": 118.931422,
-					// 	}, {
-					// 		"latitude": 32.112195,
-					// 		"longitude": 118.931922,
-					// 	},
-					// 	{
-					// 		"latitude": 32.112295,
-					// 		"longitude": 118.931522,
-					// 	},
-					// 	{
-					// 		"latitude": 32.112595,
-					// 		"longitude": 118.931922,
-					// 	}
-					// ],
 					points: [],
 					arrowLine: true, // 带箭头的线
 					dottedLine: false, // 是否虚线
@@ -104,68 +93,154 @@
 		methods: {
 			StartRun() {
 				let that = this;
-				this.startrun = false;
-				this.pauserun = true;
+				let left = getApp().globalData.Systeminfo.systemwidth / 2 - 90;
+				let top = getApp().globalData.Systeminfo.systemtop + 100;
+				let stopleft = getApp().globalData.Systeminfo.systemwidth / 2 - 40;
+				let stopheight = getApp().globalData.Systeminfo.systemheight - 100;
+				// console.log(that.controls[0].iconPath);
 				clearInterval(timer);
-				startrun = setInterval(function() {
-					uni.getLocation({
-						type: 'gcj02',
-						success: function(res) {
-							that.covers[0].latitude = res.latitude;
-							that.covers[0].longitude = res.longitude;
-							that.latitude = res.latitude;
-							that.longitude = res.longitude;
-							let newpoint = {
-								latitude: res.latitude,
-								longitude: res.longitude
-							};
-							that.polyline[0].points.push(newpoint);
-							console.log(that.polyline[0].points);
+				if (that.controls[0].iconPath == "../../static/img/startrun.png") {
+					let newcon1 = {
+						id: 2,
+						position: {
+							left: left,
+							top: top,
+							width: 180,
+							height: 180
+						},
+						iconPath: "../../static/img/3.png",
+						backgroundColor: "transparent",
+						clickable: true,
+					};
+					let newcon2 = {
+						id: 3,
+						position: {
+							left: left,
+							top: top,
+							width: 180,
+							height: 180
+						},
+						iconPath: "../../static/img/2.png",
+						backgroundColor: "transparent",
+						clickable: true,
+					};
+					let newcon3 = {
+						id: 4,
+						position: {
+							left: left,
+							top: top,
+							width: 180,
+							height: 180
+						},
+						iconPath: "../../static/img/1.png",
+						backgroundColor: "transparent",
+						clickable: true,
+					};
+					let stop = {
+						id: 4,
+						position: {
+							left: stopleft,
+							top: stopheight,
+							width: 80,
+							height: 80
+						},
+						iconPath: "../../static/img/stop.png",
+						backgroundColor: "transparent",
+						clickable: true,
+					};
+					setTimeout(function() {
+						that.controls.push(newcon1);
+						setTimeout(function() {
+							that.controls.pop();
+							that.controls.push(newcon2);
+							setTimeout(function() {
+								that.controls.pop();
+								that.controls.push(newcon3);
+								setTimeout(function() {
+									that.controls.pop();
+									that.controls.pop();
+									that.controls.push(stop);
+								}, 1000);
+							}, 1000);
+						}, 1000);
+					}, 1000);
+					startrun = setInterval(function() {
+						uni.getLocation({
+							type: 'gcj02',
+							success: function(res) {
+								that.covers[0].latitude = res.latitude;
+								that.covers[0].longitude = res.longitude;
+								that.latitude = res.latitude;
+								that.longitude = res.longitude;
+								let newpoint = {
+									latitude: res.latitude,
+									longitude: res.longitude
+								};
+								that.polyline[0].points.push(newpoint);
+							}
+						});
+					}, 2000);
+				} else if (that.controls[0].iconPath == "../../static/img/stop.png") {
+					let that = this;
+					let stop = {
+						id: 4,
+						position: {
+							left: stopleft,
+							top: stopheight,
+							width: 80,
+							height: 80
+						},
+						iconPath: "../../static/img/startrun.png",
+						backgroundColor: "transparent",
+						clickable: true,
+					};
+					that.controls.pop();
+					that.controls.push(stop);
+					clearInterval(startrun);
+					uni.showModal({
+						title: "提示",
+						content: "是否保存此次运动记录",
+						showCancel: true,
+						cancelText: "下次一定！",
+						confirmText: "存它！",
+						success: (res) => {
+							if (res.confirm) {
+								var i = 0;
+								// console.log('用户点击确定');
+								getApp().globalData.historyPath = that.polyline[0].points;
+								console.log(getApp().globalData.historyPath);
+								that.Distance();
+							} else if (res.cancel) {
+								console.log('用户点击取消');
+								return false;
+							}
 						}
 					});
-				}, 2000);
+				}
 			},
-			Pause() {
-				this.pauserun = false;
-				this.continuerun = true;
-				clearInterval(startrun);
-			},
-			Continue() {
+			Distance() {
 				let that = this;
-				this.continuerun = false;
-				this.pauserun = true;
-				startrun = setInterval(function() {
-					uni.getLocation({
-						type: 'gcj02',
-						success: function(res) {
-							that.covers[0].latitude = res.latitude;
-							that.covers[0].longitude = res.longitude;
-							that.latitude = res.latitude;
-							that.longitude = res.longitude;
-							let newpoint = {
-								latitude: res.latitude,
-								longitude: res.longitude
-							};
-							that.polyline[0].points.push(newpoint);
-							console.log(that.polyline[0].points);
+				uni.request({
+					url: "http://api.map.baidu.com/routematrix/v2/driving?output=json&origins=" + getApp().globalData.historyPath[i]
+						.latitude + "," + getApp().globalData.historyPath[i].longitude +
+						"&destinations=" + getApp().globalData.historyPath[i + 1].latitude + "," + getApp().globalData.historyPath[
+							i + 1].longitude +
+						"&ak=4DXL5GtYfjanZxjheF4EkuhBejrydkG6",
+					method: "GET",
+					success: (res) => {
+						console.log(i, res.data.result[0].distance.value);
+						getApp().globalData.historyPathDistance += res.data.result[0].distance.value;
+						if (++i < getApp().globalData.historyPath.length - 1) {
+							that.Distance();
 						}
-					});
-				}, 2000);
-			},
-			Stop() {
-				let that = this;
-				this.pauserun = false;
-				this.startrun = true;
-				clearInterval(startrun);
-				//console.log(that.polyline[0].points);
-				//that.historypath.push(that.polyline[0].points);
-				//console.log(that.historypath[0]);
-				getApp().globalData.historyPath.push(that.polyline[0].points);
-				console.log(getApp().globalData);
+						console.log(getApp().globalData.historyPathDistance);
+						return;
+					}
+				})
 			}
 		},
 		components: {
-			uniFab
+			// uniFab
 		}
 	}
 </script>
@@ -176,82 +251,23 @@
 	}
 
 	.container {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		width: 750rpx;
 		height: 100%;
+		// iOS安全区域设置
+		padding-bottom: constant(safe-area-inset-bottom);
+		padding-bottom: env(safe-area-inset-bottom);
 
 		.mapview {
 			width: 750rpx;
-			height: 80%;
+			height: 100%;
 
 			.map {
 				width: 750rpx;
 				height: 100%;
-			}
-		}
-
-		.bottompart1 {
-			width: 750rpx;
-			height: 20%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-
-			button {
-				width: 200rpx;
-				height: 200rpx;
-				background-color: #f1c40f;
-				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-
-				text {
-					font-weight: bold;
-					font-size: 50rpx;
-				}
-			}
-		}
-
-		.bottompart2 {
-			width: 750rpx;
-			height: 20%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-
-			image {
-				width: 130rpx;
-				height: 130rpx;
-			}
-		}
-
-		.bottompart3 {
-			// border: 1px solid red;
-			width: 750rpx;
-			height: 20%;
-			display: flex;
-			align-items: center;
-			justify-content: flex-end;
-
-			.bottompart3-right {
-				// border: 1px solid red;
-				width: 57%;
-				height: 100%;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: flex-start;
-
-				.continueimg {
-					width: 140rpx;
-					height: 140rpx;
-				}
-
-				.stopimg {
-					width: 80rpx;
-					height: 80rpx;
-					margin-left: 80rpx;
-				}
 			}
 		}
 	}
